@@ -43,22 +43,22 @@ const Login = () => {
                 {error && <p>{ error }</p>}
 
                 <label>Usuario</label>
-                <input className=""
+                <input className="bg-gray-100 p-2 rounded"
                     type="text"
                     value={username}
                     placeholder='Ingrese su usuario'
                     onChange={(e) => onChange(e, setUsername)}
                 />
-                
+
                 <label>Password</label>
-                <input className=""
+                <input className="bg-gray-100 p-2 rounded"
                     type="password"
                     placeholder="Ingrese su password"
                     onChange={(e) => onChange(e, setPassword)}
                     value={password}
                 />
 
-                <button className="bg-blue-100"
+                <button className="bg-blue-500 p-2 rounded text-white font-bold text-lg"
                     type="submit">
                     Log In
                 </button>

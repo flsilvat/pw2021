@@ -1,10 +1,12 @@
 import { useEffect } from 'react';
 import { useUserContext } from '../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
-import Post from '../components/Post/Post';
+import PostContainer from '../components/PostContainer';
+import { BiLogOutCircle } from 'react-icons/bi'
+
 
 const Main = () => {
-    const { logout, token } = useUserContext();
+    const { logout, token, user } = useUserContext();
     const nav = useNavigate();
 
     const logoutHandler = () => {
@@ -22,13 +24,13 @@ const Main = () => {
                 <button
                     onClick={logoutHandler}
                     type="button"
-                    className="bg-gray-200"
+                    className="bg-gray-200 rounded-full p-1 mt-1 mr-2"
                 >
-                    Log Off
+                    <BiLogOutCircle size={28} />
                 </button>
             </div>
             <div>
-                <Post />
+                <PostContainer />
             </div>
         </div>
     );
