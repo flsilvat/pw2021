@@ -1,13 +1,15 @@
 import React from 'react';
-import Post from './components/Post/Post';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
+import Main from './pages/Main';
 
-function App() {
-  return (
-    <div className="App">
-      <Login/>
-    </div>
-  );
-}
+const App = () => (
+  <BrowserRouter>
+    <Routes>
+      <Route exact path="/" element={<Main />} />
+      <Route exact path="/login" element={<Login />} />
+    </Routes>
+  </BrowserRouter>
+)
 
 export default App;

@@ -1,12 +1,13 @@
 import { useState } from 'react';
-
 import { useUserContext } from '../contexts/UserContext';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-    const { login, token } = useUserContext();
+    const { login } = useUserContext();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const nav = useNavigate();
 
     const onChange = (e, saveState) => {
         saveState(e.target.value);
@@ -21,11 +22,9 @@ const Login = () => {
         }
         
         const status = await login(username, password);
-        console.log("--login page--");
-        console.log(status);
         if (status === 200){                
             console.log("log ok");
-            //navegar
+            nav('/'); // redirecciona a Main componentPage
             setError('');
             setUsername("");
             setPassword(""); 
@@ -39,8 +38,10 @@ const Login = () => {
         <div className="flex justify-center items-center">
             <form  className="flex flex-col gap-2"
                 onSubmit={onSubmitHandler}>
+
                 <h2>Inicio de Sesion</h2>
                 {error && <p>{ error }</p>}
+
                 <label>Usuario</label>
                 <input className=""
                     type="text"
@@ -48,6 +49,7 @@ const Login = () => {
                     placeholder='Ingrese su usuario'
                     onChange={(e) => onChange(e, setUsername)}
                 />
+                
                 <label>Password</label>
                 <input className=""
                     type="password"
