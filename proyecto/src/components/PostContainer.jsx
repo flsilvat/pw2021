@@ -17,8 +17,8 @@ const PostContainer = () => {
 
 
     return (
-        <div className="bg-gray-400 flex flex-col justify-center 
-            bg-opacity-70 items-center gap-2">
+        <div className="flex flex-col justify-center 
+            items-center gap-2 md:gap-4">
             {
                 rawData.data && rawData.data.map( (post) => 
                     <Post key={post._id} data={post} />

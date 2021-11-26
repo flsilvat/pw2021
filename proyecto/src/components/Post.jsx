@@ -9,8 +9,8 @@ const Post = ( {data} ) => {
         likes, history, comments, createdAt, updatedAt, __v} = data;
 
     return (
-        <div className="bg-white flex flex-col w-full">
-            <div className="w-full flex justify-between p-2 items-center">
+        <div className="bg-white flex flex-col w-full md:rounded-lg md:shadow">
+            <div className="w-full flex justify-between p-2 md:p-3 items-center">
                 <div className="flex flex-col">
                     <h2 className="font-bold">{ user.username }</h2>
                     <p className="text-xs text-gray-400">
@@ -19,14 +19,14 @@ const Post = ( {data} ) => {
                 </div>
                 <HiOutlineDotsHorizontal size={22} color='#566573'/>
             </div>
-            <p className="px-2 pb-2 text-sm">{description}</p>
+            <p className="px-2 pb-2 md:px-3 md:pb-3 text-sm">{description}</p>
             {image && 
                 <img 
                     className="w-full"
                     src={image} alt={user.username}
                 ></img>
-            } 
-            <div className="w-full mt-2 my-1 flex justify-center gap-3">
+            }
+            <div className="w-full my-1 md:my-3 flex justify-center gap-3">
                 <div className="text-gray-600 bg-gray-200 w-1/3 p-2 rounded-full flex justify-center gap-1 items-center">
                     <AiOutlineLike size={22} color='#566573' />
                     {likes.length!=0 ? likes.length : ''}
