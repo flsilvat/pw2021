@@ -18,8 +18,9 @@ services.login = async (username, password) => {
     }
 }
 
-services.getAll = async (token) => {
-    const response = await axios.get(`${BASE_URL}/post/all?limit=10&page=0`,{
+services.getAll = async (token, filters = {}) => {
+    const { limit, page } = filters;
+    const response = await axios.get(`${BASE_URL}/post/all?limit=${limit}&page=${page}`,{
         headers: { Authorization: `Bearer ${ token }` }
     });
     if (response.status === 200) return response.data;
@@ -28,10 +29,22 @@ services.getAll = async (token) => {
 
 services.verifyToken = async (token) => {
     const response = await axios.get(`${BASE_URL}/auth/whoami`,{
-        headers: { Authorization: `Bearer ${ token }`}
+        headers: { Authorization: `Bearer ${ token }` }
     });
     if (response.status === 200) return response.data;
     else return {};
+}
+
+services.post = async (token, data) => {
+  try{
+    const response = await axios.post(`${BASE_URL}/post/create`, 
+      { ...data, active: data.active = true },
+      { headers: { Authorization: `Bearer ${ token }` } }
+    );
+    return response;
+  } catch (error) {
+    return {};
+  }
 }
 
 //https://gist.github.com/valarpirai/27ed1b874142ade9b1d0

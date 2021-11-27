@@ -19,6 +19,7 @@ const Post = ( {data} ) => {
                 </div>
                 <HiOutlineDotsHorizontal size={22} color='#566573'/>
             </div>
+            <p className="px-2 md:px-3 md:pb-3 text-sm font-bold">{title}</p>
             <p className="px-2 pb-2 md:px-3 md:pb-3 text-sm">{description}</p>
             {image && 
                 <img 

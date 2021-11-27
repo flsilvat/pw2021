@@ -1,13 +1,16 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useUserContext } from '../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
 import PostContainer from '../components/PostContainer';
 import { BiLogOutCircle } from 'react-icons/bi'
+import NewPostForm from '../components/NewPostForm';
+import PageButton from '../components/PageButton';
 
 
 const Main = () => {
     const { logout, token, user } = useUserContext();
     const nav = useNavigate();
+    const [filters, setFilters] = useState({ limit: 15, page: 0 });
 
     const logoutHandler = () => {
         logout();
@@ -17,6 +20,20 @@ const Main = () => {
     useEffect(() => {
         if (token == null) nav('/login');
     });
+
+    const previousPageHandler = () => {
+        console.log("previous page");
+        const {page} = filters;
+        if(page>0){
+            setFilters({ limit: 15, page: page - 1 });
+        }
+
+    }
+    const nextPageHandler = () => {
+        console.log("next page");
+        const {page} = filters;
+        setFilters({ limit: 15, page: page + 1 });
+    }
 
     return (
         <div className="bg-gray-400 md:bg-gray-200">
@@ -34,10 +51,17 @@ const Main = () => {
                     </button>
                 </div>
                 {user?.role === 'admin' && (
-                    <h2>newPost</h2>
+                    <NewPostForm />
                 )}
 
-                <PostContainer />
+                <PostContainer filters={filters} />
+
+                <div className="flex justify-center py-3 gap-10">
+                    {filters.page!==0 &&
+                        <PageButton text="Anterior" onClick= {previousPageHandler}/>
+                    }
+                    <PageButton text="Siguiente" onClick = {nextPageHandler}/>
+                </div>
 
             </div>
         </div>

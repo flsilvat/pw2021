@@ -6,6 +6,7 @@ const UserContext = React.createContext();
 export const UserProvider = (props) => {
     const [token, setToken] = useState(undefined);
     const [user, setUser] = useState(undefined);
+    const [rawData, setRawData] = useState(undefined);
 
     useEffect(() => {
         const verifyTokenAsync = async () => {
@@ -22,10 +23,12 @@ export const UserProvider = (props) => {
         verifyTokenAsync();
     }, [token])
 
+
     const setTokenAll = (token) => {
         localStorage.setItem('token', token);
         setToken(token);
     }
+
 
     const login = useCallback( (username, password) => {
         const loginAsync = async () => {
@@ -51,7 +54,7 @@ export const UserProvider = (props) => {
         token: token,
         user: user,
         login: login,
-        logout: logout
+        logout: logout,
     }), [token, user, login, logout]);
 
     return <UserContext.Provider value={value} {...props} />;

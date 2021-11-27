@@ -3,17 +3,17 @@ import services from '../services/services';
 import { useUserContext } from '../contexts/UserContext';
 import Post from './Post';
 
-const PostContainer = () => {
+const PostContainer = ( {filters} ) => {
     const [rawData, setRawData] = useState({});
     const { token } = useUserContext();
 
     useEffect(() => {
         const getAll = async () => {
-            const raw = await services.getAll(token);
+            const raw = await services.getAll(token, filters);
             setRawData(raw);
         }
         getAll();
-    }, []);
+    }, [filters]);
 
 
     return (
