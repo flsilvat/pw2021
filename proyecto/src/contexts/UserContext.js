@@ -6,7 +6,6 @@ const UserContext = React.createContext();
 export const UserProvider = (props) => {
     const [token, setToken] = useState(undefined);
     const [user, setUser] = useState(undefined);
-    const [rawData, setRawData] = useState(undefined);
 
     useEffect(() => {
         const verifyTokenAsync = async () => {

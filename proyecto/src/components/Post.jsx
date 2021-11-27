@@ -1,12 +1,34 @@
-import React from 'react';
+import axios from 'axios';
+import React, { useState } from 'react';
 import services from '../services/services';
 import { AiOutlineLike } from 'react-icons/ai';
 import { FaRegCommentAlt } from 'react-icons/fa';
 import { HiOutlineDotsHorizontal } from 'react-icons/hi';
 
-const Post = ( {data} ) => {
+const Post = ( {data, loggedUser, token} ) => {
     const { _id, title, description, image, active, user, 
         likes, history, comments, createdAt, updatedAt, __v} = data;
+    const [like, setLike] = useState(likes.some((x) => x.username === loggedUser.username));
+    const [likesLength, setLikesLength] = useState(likes.length);
+
+    const likePost = async () => {
+        try{
+            const response = await axios.patch(`https://posts-pw2021.herokuapp.com/api/v1/post/like/${_id}`, null,
+                { headers: { Authorization: `Bearer ${token}`}}
+            )
+            if (!like){
+                setLikesLength(likesLength + 1);
+                setLike(!like);
+            }
+            else {
+                setLikesLength(likesLength - 1);
+                setLike(!like);
+            }
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     return (
         <div className="bg-white flex flex-col w-full md:rounded-lg md:shadow">
@@ -28,12 +50,16 @@ const Post = ( {data} ) => {
                 ></img>
             }
             <div className="w-full my-1 md:my-3 flex justify-center gap-3">
+                <button 
+                    className={`text-gray-600 bg-gray-200 w-1/3 p-2 rounded-full flex 
+                        justify-center gap-1 items-center ${like && 'text-blue-500 font-bold'}`}
+                    onClick={likePost} type="button"
+                >
+                    <AiOutlineLike size={22} />
+                    {likesLength!=0 ? likesLength : ''}
+                </button>
                 <div className="text-gray-600 bg-gray-200 w-1/3 p-2 rounded-full flex justify-center gap-1 items-center">
-                    <AiOutlineLike size={22} color='#566573' />
-                    {likes.length!=0 ? likes.length : ''}
-                </div>
-                <div className="text-gray-600 bg-gray-200 w-1/3 p-2 rounded-full flex justify-center gap-1 items-center">
-                    <FaRegCommentAlt size={19} color='#566573' />
+                    <FaRegCommentAlt size={19} />
                     {comments.length!=0 ? comments.length : ''}
                 </div>
             </div>

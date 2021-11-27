@@ -19,10 +19,9 @@ const Main = () => {
 
     useEffect(() => {
         if (token == null) nav('/login');
-    });
+    },[]);
 
     const previousPageHandler = () => {
-        console.log("previous page");
         const {page} = filters;
         if(page>0){
             setFilters({ limit: 15, page: page - 1 });
@@ -30,7 +29,6 @@ const Main = () => {
 
     }
     const nextPageHandler = () => {
-        console.log("next page");
         const {page} = filters;
         setFilters({ limit: 15, page: page + 1 });
     }

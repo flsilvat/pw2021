@@ -5,7 +5,7 @@ import Post from './Post';
 
 const PostContainer = ( {filters} ) => {
     const [rawData, setRawData] = useState({});
-    const { token } = useUserContext();
+    const { token, user } = useUserContext();
 
     useEffect(() => {
         const getAll = async () => {
@@ -21,7 +21,7 @@ const PostContainer = ( {filters} ) => {
             items-center gap-2 md:gap-4">
             {
                 rawData.data && rawData.data.map( (post) => 
-                    <Post key={post._id} data={post} />
+                    <Post loggedUser={user} key={post._id} data={post} token={token}/>
                 )
             }
         </div>
