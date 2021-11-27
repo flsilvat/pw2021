@@ -1,15 +1,19 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import services from '../services/services';
-import { AiOutlineLike } from 'react-icons/ai';
+import { AiOutlineLike, AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import { FaRegCommentAlt } from 'react-icons/fa';
 import { HiOutlineDotsHorizontal } from 'react-icons/hi';
+import Comment from './Comment';
 
-const Post = ( {data, loggedUser, token} ) => {
+
+const Post = ( {data, loggedUser, token, userFavs} ) => {
     const { _id, title, description, image, active, user, 
         likes, history, comments, createdAt, updatedAt, __v} = data;
     const [like, setLike] = useState(likes.some((x) => x.username === loggedUser.username));
     const [likesLength, setLikesLength] = useState(likes.length);
+    const [fav, setFav] = useState(userFavs.favorites?.some((x) => x === _id));
+    const [viewComments, setViewComments] = useState(false);
 
     const likePost = async () => {
         try{
@@ -25,6 +29,19 @@ const Post = ( {data, loggedUser, token} ) => {
                 setLike(!like);
             }
 
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const favPost = async () => {
+        try{
+            const response = await axios.patch(`https://posts-pw2021.herokuapp.com/api/v1/post/fav/${_id}`, null,
+                { headers: { Authorization: `Bearer ${token}`}}
+            )
+            //console.log(response);
+            if (!fav) setFav(!fav);
+            else setFav(!fav);
         } catch (error) {
             console.log(error);
         }
@@ -49,19 +66,32 @@ const Post = ( {data, loggedUser, token} ) => {
                     src={image} alt={user.username}
                 ></img>
             }
-            <div className="w-full my-1 md:my-3 flex justify-center gap-3">
+            <div className="w-full mt-2 md:mt-3 flex justify-center gap-3">
                 <button 
-                    className={`text-gray-600 bg-gray-200 w-1/3 p-2 rounded-full flex 
+                    className={`text-gray-600 bg-gray-200 w-1/5 p-2 rounded-full flex 
                         justify-center gap-1 items-center ${like && 'text-blue-500 font-bold'}`}
                     onClick={likePost} type="button"
                 >
                     <AiOutlineLike size={22} />
                     {likesLength!=0 ? likesLength : ''}
                 </button>
-                <div className="text-gray-600 bg-gray-200 w-1/3 p-2 rounded-full flex justify-center gap-1 items-center">
+                <button
+                    className={`text-gray-600 bg-gray-200 w-1/5 p-2 rounded-full flex 
+                    justify-center gap-1 items-center ${fav && 'text-red-500 font-bold'}`}
+                    onClick={favPost} type="button"
+                >
+                    {fav ? <AiFillHeart size={24} /> : <AiOutlineHeart size={24} />}
+                    
+                </button>
+                <div className="text-gray-600 bg-gray-200 w-1/5 p-2 rounded-full flex justify-center gap-1 items-center">
                     <FaRegCommentAlt size={19} />
                     {comments.length!=0 ? comments.length : ''}
                 </div>
+            </div>
+            <div className="w-full">
+                {comments && comments.map((comment) => (
+                    <Comment key={comment._id} comment={comment}/>
+                ))}
             </div>
         </div>
     )

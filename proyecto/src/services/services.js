@@ -27,6 +27,14 @@ services.getAll = async (token, filters = {}) => {
     else return {};
 }
 
+services.getFavs = async (token) => {
+  const response = await axios.get(`${BASE_URL}/post/fav`,{
+    headers: { Authorization: `Bearer ${ token }` }
+  });
+  if (response.status === 200) return response.data;
+  else return {};
+}
+
 services.verifyToken = async (token) => {
     const response = await axios.get(`${BASE_URL}/auth/whoami`,{
         headers: { Authorization: `Bearer ${ token }` }
