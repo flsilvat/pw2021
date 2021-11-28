@@ -31,8 +31,8 @@ const PostContainer = ( {filters,reload,setReload} ) => {
         <div className="flex flex-col justify-center 
             items-center gap-2 md:gap-4">
             {
-                rawData.data && rawData.data.map( (post) => 
-                    <Post loggedUser={user} key={post._id} data={post} token={token} userFavs={userFavs} setReload={setReload} />
+                rawData.data && userFavs.favorites && rawData.data.map( (post) => 
+                    <Post loggedUser={user} key={post._id} data={post} token={token} userFavs={userFavs.favorites ? userFavs.favorites.some((x) => x === post._id) : false} setReload={setReload} />
                 )
             }
         </div>

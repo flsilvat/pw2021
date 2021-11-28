@@ -15,7 +15,7 @@ const Post = ({ data, loggedUser, token, userFavs, setReload }) => {
         likes, history, comments, createdAt, updatedAt, __v } = data;
     const [like, setLike] = useState(likes.some((x) => x.username === loggedUser.username));
     const [likesLength, setLikesLength] = useState(likes.length);
-    const [fav, setFav] = useState(userFavs.favorites?.some((x) => x === _id));
+    const [fav, setFav] = useState(userFavs);
     const [viewComments, setViewComments] = useState(false);
 
     const [commentTxt, setCommentTxt] = useState("");

@@ -15,7 +15,9 @@ const Main = () => {
 
     const logoutHandler = () => {
         logout();
-        nav('/');
+        console.log("cleared");
+        nav('/login');
+        console.log("logged out");
     }
 
     useEffect(() => {
