@@ -35,15 +35,16 @@ const Login = () => {
     }
 
     return (
-        <div className="flex justify-center items-center">
-            <form  className="flex flex-col gap-2"
+        <div className="flex flex-col justify-center items-center min-h-screen bg-gray-200">
+            <form  className="flex flex-col gap-2 bg-white p-4 rounded-lg w-80 shadow-md"
                 onSubmit={onSubmitHandler}>
 
-                <h2>Inicio de Sesion</h2>
+                <h2 className="font-bold text-blue-500 text-2xl">Inicio de Sesion</h2>
                 {error && <p>{ error }</p>}
 
                 <label>Usuario</label>
-                <input className="bg-gray-100 p-2 rounded"
+                <input className="bg-gray-100 p-2 rounded-lg border border-gray-400 
+                    focus:outline-none focus:ring-4 focus:border-blue-600"
                     type="text"
                     value={username}
                     placeholder='Ingrese su usuario'
@@ -51,18 +52,21 @@ const Login = () => {
                 />
 
                 <label>Password</label>
-                <input className="bg-gray-100 p-2 rounded"
+                <input className="bg-gray-100 p-2 rounded-lg border border-gray-400
+                    focus:outline-none focus:ring-4 focus:border-blue-600"
                     type="password"
                     placeholder="Ingrese su password"
                     onChange={(e) => onChange(e, setPassword)}
                     value={password}
                 />
 
-                <button className="bg-blue-500 p-2 rounded text-white font-bold text-lg"
+                <button className="bg-blue-500 p-2 mt-4 rounded-lg text-white font-bold text-lg
+                    transition duration-100 hover:bg-blue-700"
                     type="submit">
                     Log In
                 </button>
             </form>
+            <p className="justify-self-start mt-6 text-xs text-gray-600">Programacion Web © 2021 </p>
         </div>
     )
 }
