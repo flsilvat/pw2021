@@ -3,12 +3,12 @@ import services from '../services/services';
 import { useUserContext } from '../contexts/UserContext';
 import Post from './Post';
 
-const PostContainer = ( {filters} ) => {
+const PostContainer = ( {filters,reload,setReload} ) => {
     const [rawData, setRawData] = useState({});
     const { token, user } = useUserContext();
     const [userFavs, setUserFavs] = useState({});
 
-    const [reload,setReload] = useState(true);
+    
 
     useEffect(() => {
         if(reload){

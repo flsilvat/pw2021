@@ -11,6 +11,7 @@ const Main = () => {
     const { logout, token, user } = useUserContext();
     const nav = useNavigate();
     const [filters, setFilters] = useState({ limit: 15, page: 0 });
+    const [reload,setReload] = useState(true);
 
     const logoutHandler = () => {
         logout();
@@ -24,12 +25,14 @@ const Main = () => {
     const previousPageHandler = () => {
         const {page} = filters;
         if(page>0){
+            setReload(true);
             setFilters({ limit: 15, page: page - 1 });
         }
 
     }
     const nextPageHandler = () => {
         const {page} = filters;
+        setReload(true);
         setFilters({ limit: 15, page: page + 1 });
     }
 
@@ -52,7 +55,7 @@ const Main = () => {
                     <NewPostForm />
                 )}
 
-                <PostContainer filters={filters} />
+                <PostContainer filters={filters} reload={reload} setReload={setReload} />
 
                 <div className="flex justify-center py-3 gap-10">
                     {filters.page!==0 &&
