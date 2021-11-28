@@ -54,7 +54,7 @@ const Main = () => {
                     </button>
                 </div>
                 {user?.role === 'admin' && (
-                    <NewPostForm />
+                    <NewPostForm setReload={setReload}/>
                 )}
 
                 <PostContainer filters={filters} reload={reload} setReload={setReload} />

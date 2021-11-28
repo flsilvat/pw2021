@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState,useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import services from '../services/services';
 import { AiOutlineLike, AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import { FaRegCommentAlt } from 'react-icons/fa';
@@ -13,20 +13,21 @@ import NewComment from './NewComment';
 const Post = ({ data, loggedUser, token, userFavs, setReload }) => {
     const { _id, title, description, image, active, user,
         likes, history, comments, createdAt, updatedAt, __v } = data;
+    const owner = user.username === loggedUser.username;
     const [like, setLike] = useState(likes.some((x) => x.username === loggedUser.username));
     const [likesLength, setLikesLength] = useState(likes.length);
     const [fav, setFav] = useState(userFavs);
     const [viewComments, setViewComments] = useState(false);
-
     const [commentTxt, setCommentTxt] = useState("");
     const [editing, setEditing] = useState(false);
+    const [error, setError] = useState(false);
 
-    
+
 
     const onChangeCommentPost = (e) => {
         setCommentTxt(e.target.value);
     }
-    	
+
     const commentPost = async (e) => {
         try {
             e.preventDefault();
@@ -84,12 +85,29 @@ const Post = ({ data, loggedUser, token, userFavs, setReload }) => {
     }
 
     const editMode = () => {
+        if (!owner) return;
+        console.log(user);
         setEditing(!editing);
     }
 
     const submitEdit = async (e) => {
         e.preventDefault();
-        setEditing(!editing);
+
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+
+        if (data.title === '' || data.description === '' || data.image === '') {
+            setError(true);
+            return;
+        }
+        setError(false);
+        console.log(data);
+        const response = await services.update(token, _id, data);
+        console.log(response);
+        if (response) {
+            setEditing(!editing);
+            setReload(true);
+        }
     }
 
 
@@ -102,23 +120,26 @@ const Post = ({ data, loggedUser, token, userFavs, setReload }) => {
                         {services.timeSince(createdAt)}
                     </p>
                 </div>
-                <button
-                    className="hover:text-red-500 font-bold"
-                    onClick={editMode} type="button"
-                >
-                    <HiOutlineDotsHorizontal size={22} color='#566573' />
-                </button>
+                {owner &&
+                    <button
+                        className="hover:text-red-500 font-bold"
+                        onClick={editMode} type="button"
+                    >
+                        <HiOutlineDotsHorizontal size={22} color='#566573' />
+                    </button>
+                }
+
             </div>
             {!editing &&
                 <p className="px-2 md:px-3 md:pb-3 text-sm font-bold">{title}</p>
             }
-            
 
-            
+
+
             {!editing &&
                 <p className="px-2 pb-2 md:px-3 md:pb-3 text-sm">{description}</p>
             }
-            
+
             {image && !editing &&
                 <img
                     className="w-full"
@@ -149,7 +170,7 @@ const Post = ({ data, loggedUser, token, userFavs, setReload }) => {
                         {comments.length != 0 ? comments.length : ''}
                     </div>
                 </div>
-                
+
             }
             {!editing &&
                 <div>
@@ -158,36 +179,37 @@ const Post = ({ data, loggedUser, token, userFavs, setReload }) => {
             }
             {!editing &&
                 <div className="w-full">
-                {comments && comments.map((comment) => (
-                    <Comment key={comment._id} comment={comment} />
-                ))}
+                    {comments && comments.map((comment) => (
+                        <Comment key={comment._id} comment={comment} />
+                    ))}
                 </div>
             }
 
-            {editing &&
+            {editing && owner &&
                 <form className="bg-white flex flex-col p-2 mb-2 items-center"
                     onSubmit={submitEdit}
                 >
+                    {error && <p>Todos los campos son requeridos!</p>}
                     <input className="bg-gray-100 px-3 py-1 mb-2 w-4/5 text-sm rounded-full placeholder-gray-800"
                         type="text"
                         name="title"
                         id="title"
                         placeholder="Titulo del Post"
-                        value={title}
+                        defaultValue={title}
                     />
                     <input className="bg-gray-100 px-3 py-1 mb-2 w-full text-xs rounded-full placeholder-gray-800"
                         type="text"
                         name="image"
                         id="image"
                         placeholder="URL de la imagen"
-                        value={image}
+                        defaultValue={image}
                     />
                     <textarea className="bg-gray-100 px-2 py-1 mb-2 w-full text-xs rounded-xl placeholder-gray-800"
                         rows="3" cols="40"
                         name="description"
                         id="description"
                         placeholder="Descripcion del Post"
-                        value={description}
+                        defaultValue={description}
                     />
                     <button className="bg-blue-500 p-1 rounded text-white font-bold text-sm w-1/3"
                         type="submit"
@@ -195,8 +217,9 @@ const Post = ({ data, loggedUser, token, userFavs, setReload }) => {
                         Actualizar
                     </button>
                 </form>
-            } 
+            }
         </div>
     )
 }
+
 export default Post;
