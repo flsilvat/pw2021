@@ -1,3 +1,5 @@
+import React from 'react';
+
 const Comment = ({ comment }) => {
     const { user, description } = comment;
 

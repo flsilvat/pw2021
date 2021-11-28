@@ -5,6 +5,7 @@ import { AiOutlineLike, AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import { FaRegCommentAlt } from 'react-icons/fa';
 import { HiOutlineDotsHorizontal } from 'react-icons/hi';
 import Comment from './Comment';
+import NewComment from './NewComment';
 
 
 const Post = ( {data, loggedUser, token, userFavs} ) => {
