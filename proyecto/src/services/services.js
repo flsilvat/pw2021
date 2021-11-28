@@ -43,10 +43,22 @@ services.verifyToken = async (token) => {
     else return {};
 }
 
-services.post = async (token, data) => {
+services.create = async (token, data) => {
   try{
     const response = await axios.post(`${BASE_URL}/post/create`, 
       { ...data, active: data.active = true },
+      { headers: { Authorization: `Bearer ${ token }` } }
+    );
+    return response;
+  } catch (error) {
+    return {};
+  }
+}
+
+services.update = async (token, id, data) => {
+  try{
+    const response = await axios.put(`${BASE_URL}/post/update/${id}`, 
+      { ...data},
       { headers: { Authorization: `Bearer ${ token }` } }
     );
     return response;

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useUserContext } from '../contexts/UserContext';
 import services from '../services/services';
 
-const NewPostForm = () => {
+const NewPostForm = ({setReload}) => {
     const [error, setError] = useState(false);
     const { token } = useUserContext();
 
@@ -12,18 +12,22 @@ const NewPostForm = () => {
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData.entries());
 
-        if (data.title === '' || data.description === '' || data.image === '') setError(true);
-
-        if (!error){
-            console.log(data);
-            const response = await services.post(token, data);
-            console.log(response);
-            if(response) setError(false);
+        if (data.title === '' || data.description === '' || data.image === '') {
+            setError(true);
+            return;
+        }
+        setError(false);
+        console.log(data);
+        const response = await services.create(token, data);
+        console.log(response);
+        if (response) {
+            document.getElementById("new-post").reset();
+            setReload(true);
         }
     }
 
     return (
-        <form className="bg-white flex flex-col p-2 mb-2 items-center"
+        <form name="new-post" id="new-post" className="bg-white flex flex-col p-2 mb-2 items-center"
             onSubmit={onSubmit}
         >
             {error && <p>Todos los campos son requeridos!</p>}
@@ -37,7 +41,7 @@ const NewPostForm = () => {
                 type="text"
                 name="image"
                 id="image"
-                placeholder="Ingrese el URL de la imagen"
+                placeholder="URL de la imagen"
             />
             <textarea className="bg-gray-100 px-2 py-1 mb-2 w-full text-xs rounded-xl placeholder-gray-800"
                 rows="3" cols="40"

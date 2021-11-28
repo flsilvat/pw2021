@@ -32,7 +32,7 @@ const PostContainer = ( {filters,reload,setReload} ) => {
             items-center gap-2 md:gap-4">
             {
                 rawData.data && userFavs.favorites && rawData.data.map( (post) => 
-                    <Post loggedUser={user} key={post._id} data={post} token={token} userFavs={userFavs.favorites ? userFavs.favorites.some((x) => x === post._id) : false} setReload={setReload} />
+                    <Post loggedUser={user} key={post._id} data={post} token={token} userFavs={userFavs.favorites.some((x) => x === post._id)} setReload={setReload} />
                 )
             }
         </div>
