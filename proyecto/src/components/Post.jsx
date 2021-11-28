@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useState,useCallback } from 'react';
 import services from '../services/services';
 import { AiOutlineLike, AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
 import { FaRegCommentAlt } from 'react-icons/fa';
@@ -8,7 +8,9 @@ import Comment from './Comment';
 import NewComment from './NewComment';
 
 
-const Post = ({ data, loggedUser, token, userFavs }) => {
+
+
+const Post = ({ data, loggedUser, token, userFavs, setReload }) => {
     const { _id, title, description, image, active, user,
         likes, history, comments, createdAt, updatedAt, __v } = data;
     const [like, setLike] = useState(likes.some((x) => x.username === loggedUser.username));
@@ -18,35 +20,36 @@ const Post = ({ data, loggedUser, token, userFavs }) => {
 
     const [commentTxt, setCommentTxt] = useState("");
 
+    
+
+
     const onChangeCommentPost = (e) => {
         setCommentTxt(e.target.value);
     }
-
+    	
     const commentPost = async (e) => {
         try {
             e.preventDefault();
-            console.log(commentTxt);
+
             const body = {
                 description: commentTxt,
             };
-            const response = await axios.patch(`https://posts-pw2021.herokuapp.com/api/v1/post/comment/${_id}`, body, {
+            await axios.patch(`https://posts-pw2021.herokuapp.com/api/v1/post/comment/${_id}`, body, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             }
             );
 
-            console.log(response);
-
-
             setCommentTxt("");
+
+            setReload(true);
 
         }
         catch (error) {
             console.log(error)
         }
     }
-
 
     const likePost = async () => {
         try {
@@ -126,9 +129,9 @@ const Post = ({ data, loggedUser, token, userFavs }) => {
                 <NewComment onClick={commentPost} onChange={onChangeCommentPost} value={commentTxt} />
             </div>
             <div className="w-full">
-                {comments && comments.map((comment) => (
-                    <Comment key={comment._id} comment={comment} />
-                ))}
+            {comments && comments.map((comment) => (
+                <Comment key={comment._id} comment={comment} />
+            ))}
             </div>
         </div>
     )
