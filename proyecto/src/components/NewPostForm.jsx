@@ -37,7 +37,7 @@ const NewPostForm = () => {
                 type="text"
                 name="image"
                 id="image"
-                placeholder="Ingrese el URL de la imagen"
+                placeholder="URL de la imagen"
             />
             <textarea className="bg-gray-100 px-2 py-1 mb-2 w-full text-xs rounded-xl placeholder-gray-800"
                 rows="3" cols="40"

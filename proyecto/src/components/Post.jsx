@@ -19,9 +19,9 @@ const Post = ({ data, loggedUser, token, userFavs, setReload }) => {
     const [viewComments, setViewComments] = useState(false);
 
     const [commentTxt, setCommentTxt] = useState("");
+    const [editing, setEditing] = useState(false);
 
     
-
 
     const onChangeCommentPost = (e) => {
         setCommentTxt(e.target.value);
@@ -83,6 +83,15 @@ const Post = ({ data, loggedUser, token, userFavs, setReload }) => {
         }
     }
 
+    const editMode = () => {
+        setEditing(!editing);
+    }
+
+    const submitEdit = async (e) => {
+        e.preventDefault();
+        setEditing(!editing);
+    }
+
 
     return (
         <div className="bg-white flex flex-col w-full md:rounded-lg md:shadow">
@@ -93,48 +102,101 @@ const Post = ({ data, loggedUser, token, userFavs, setReload }) => {
                         {services.timeSince(createdAt)}
                     </p>
                 </div>
-                <HiOutlineDotsHorizontal size={22} color='#566573' />
+                <button
+                    className="hover:text-red-500 font-bold"
+                    onClick={editMode} type="button"
+                >
+                    <HiOutlineDotsHorizontal size={22} color='#566573' />
+                </button>
             </div>
-            <p className="px-2 md:px-3 md:pb-3 text-sm font-bold">{title}</p>
-            <p className="px-2 pb-2 md:px-3 md:pb-3 text-sm">{description}</p>
-            {image &&
+            {!editing &&
+                <p className="px-2 md:px-3 md:pb-3 text-sm font-bold">{title}</p>
+            }
+            
+
+            
+            {!editing &&
+                <p className="px-2 pb-2 md:px-3 md:pb-3 text-sm">{description}</p>
+            }
+            
+            {image && !editing &&
                 <img
                     className="w-full"
                     src={image} alt={user.username}
                 ></img>
             }
-            <div className="w-full mt-2 md:mt-3 flex justify-center gap-3">
-                <button
-                    className={`text-gray-600 bg-gray-200 w-1/5 p-2 rounded-full flex 
-                        justify-center gap-1 items-center ${like && 'text-blue-500 font-bold'}`}
-                    onClick={likePost} type="button"
-                >
-                    <AiOutlineLike size={22} />
-                    {likesLength != 0 ? likesLength : ''}
-                </button>
-                <button
-                    className={`text-gray-600 bg-gray-200 w-1/5 p-2 rounded-full flex 
-                    justify-center gap-1 items-center ${fav && 'text-red-500 font-bold'}`}
-                    onClick={favPost} type="button"
-                >
-                    {fav ? <AiFillHeart size={24} /> : <AiOutlineHeart size={24} />}
 
-                </button>
-                <div className="text-gray-600 bg-gray-200 w-1/5 p-2 rounded-full flex justify-center gap-1 items-center">
-                    <FaRegCommentAlt size={19} />
-                    {comments.length != 0 ? comments.length : ''}
+            {!editing &&
+                <div className="w-full mt-2 md:mt-3 flex justify-center gap-3">
+                    <button
+                        className={`text-gray-600 bg-gray-200 w-1/5 p-2 rounded-full flex 
+                            justify-center gap-1 items-center ${like && 'text-blue-500 font-bold'}`}
+                        onClick={likePost} type="button"
+                    >
+                        <AiOutlineLike size={22} />
+                        {likesLength != 0 ? likesLength : ''}
+                    </button>
+                    <button
+                        className={`text-gray-600 bg-gray-200 w-1/5 p-2 rounded-full flex 
+                        justify-center gap-1 items-center ${fav && 'text-red-500 font-bold'}`}
+                        onClick={favPost} type="button"
+                    >
+                        {fav ? <AiFillHeart size={24} /> : <AiOutlineHeart size={24} />}
+
+                    </button>
+                    <div className="text-gray-600 bg-gray-200 w-1/5 p-2 rounded-full flex justify-center gap-1 items-center">
+                        <FaRegCommentAlt size={19} />
+                        {comments.length != 0 ? comments.length : ''}
+                    </div>
                 </div>
-            </div>
-            <div>
-                <NewComment onClick={commentPost} onChange={onChangeCommentPost} value={commentTxt} />
-            </div>
-            <div className="w-full">
-            {comments && comments.map((comment) => (
-                <Comment key={comment._id} comment={comment} />
-            ))}
-            </div>
+                
+            }
+            {!editing &&
+                <div>
+                    <NewComment onClick={commentPost} onChange={onChangeCommentPost} value={commentTxt} />
+                </div>
+            }
+            {!editing &&
+                <div className="w-full">
+                {comments && comments.map((comment) => (
+                    <Comment key={comment._id} comment={comment} />
+                ))}
+                </div>
+            }
+
+            {editing &&
+                <form className="bg-white flex flex-col p-2 mb-2 items-center"
+                    onSubmit={submitEdit}
+                >
+                    <input className="bg-gray-100 px-3 py-1 mb-2 w-4/5 text-sm rounded-full placeholder-gray-800"
+                        type="text"
+                        name="title"
+                        id="title"
+                        placeholder="Titulo del Post"
+                        value={title}
+                    />
+                    <input className="bg-gray-100 px-3 py-1 mb-2 w-full text-xs rounded-full placeholder-gray-800"
+                        type="text"
+                        name="image"
+                        id="image"
+                        placeholder="URL de la imagen"
+                        value={image}
+                    />
+                    <textarea className="bg-gray-100 px-2 py-1 mb-2 w-full text-xs rounded-xl placeholder-gray-800"
+                        rows="3" cols="40"
+                        name="description"
+                        id="description"
+                        placeholder="Descripcion del Post"
+                        value={description}
+                    />
+                    <button className="bg-blue-500 p-1 rounded text-white font-bold text-sm w-1/3"
+                        type="submit"
+                    >
+                        Actualizar
+                    </button>
+                </form>
+            } 
         </div>
     )
 }
-
 export default Post;
