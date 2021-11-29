@@ -3,6 +3,7 @@ import services from '../services/services';
 import { AiOutlineEye, AiOutlineEyeInvisible, AiOutlineEdit, AiOutlineLike, AiFillLike, AiOutlineHeart, AiFillHeart, AiOutlineComment } from 'react-icons/ai';
 import Comment from './Comment';
 import NewComment from './NewComment';
+import PostEdit from './PostEdit';
 
 const Post = ({ data, loggedUser, token, userFavs, setReload }) => {
     const { _id, title, description, image, active, user,
@@ -15,9 +16,6 @@ const Post = ({ data, loggedUser, token, userFavs, setReload }) => {
     const [commentTxt, setCommentTxt] = useState("");
     const [editing, setEditing] = useState(false);
     const [confirmActivate, setConfirmActivate] = useState(false);
-    const [error1, setError1] = useState(false);
-    const [error2, setError2] = useState(false);
-    const [error3, setError3] = useState(false);
 
     const onChangeCommentPost = (e) => {
         setCommentTxt(e.target.value);
@@ -57,47 +55,22 @@ const Post = ({ data, loggedUser, token, userFavs, setReload }) => {
     const editMode = () => {
         if (!owner) return;
         setEditing(!editing);
-        if (!editing) {
-            setError1(false);
-            setError2(false);
-            setError3(false);
-        }
+        
     }
 
-    const submitEdit = async (e) => {
-        e.preventDefault();
-
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData.entries());
-
-        setError1(false);
-        setError2(false);
-        setError3(false);
-
-        if (data.title === '' || data.description === '' || data.image === '') {
-            setError1(true);
-            return;
-        }
-        if (data.title.length < 8 || data.title.length > 32) {
-            setError2(true);
-            return;
-        }
-        if (data.description.length < 8) {
-            setError3(true);
-            return;
-        }
-        console.log(data);
-        const response = await services.update(token, _id, data);
-        console.log(response);
-
-        if (!response) return;
-        setEditing(!editing);
-        setReload(true);
-    }
-
+    
     const toggleActive = () => {
         if (!confirmActivate) {
             setConfirmActivate(true);
+            const waitConfirmation = async () => {
+                const timeout = (time) => {
+                    return new Promise((resolve) => setTimeout(resolve, time));
+                };
+            
+                await timeout(5000);
+                setConfirmActivate(false);
+            }
+            waitConfirmation();
             return;
         }
         setConfirmActivate(false);
@@ -195,49 +168,7 @@ const Post = ({ data, loggedUser, token, userFavs, setReload }) => {
             }
 
             {editing && owner &&
-                <form className="bg-white flex flex-col p-2 mb-2 items-center"
-                    onSubmit={submitEdit}
-                >
-                    <div className="text-red-600">
-                        {error1 && <p>Todos los campos son requeridos!</p>}
-                        {error2 && <p>Titulo debe ser entre 8 y 32 caracteres de largo.</p>}
-                        {error3 && <p>Descripcion debe ser minimo 8 caracteres de largo.</p>}
-                    </div>
-                    <input className="bg-gray-100 px-3 py-1 mb-2 w-4/5 text-sm rounded-full placeholder-gray-800"
-                        type="text"
-                        name="title"
-                        id="title"
-                        placeholder="Titulo del Post"
-                        defaultValue={title}
-                    />
-                    <input className="bg-gray-100 px-3 py-1 mb-2 w-full text-xs rounded-full placeholder-gray-800"
-                        type="text"
-                        name="image"
-                        id="image"
-                        placeholder="URL de la imagen"
-                        defaultValue={image}
-                    />
-                    <textarea className="bg-gray-100 px-2 py-1 mb-2 w-full text-xs rounded-xl placeholder-gray-800"
-                        rows="3" cols="40"
-                        name="description"
-                        id="description"
-                        placeholder="Descripcion del Post"
-                        defaultValue={description}
-                    />
-                    <div className="flex row w-full justify-center g-3">
-                        <button className="bg-gray-200 p-1 rounded text-gray-600 font-bold text-sm w-1/3"
-                            onClick={editMode}
-                        >
-                            Cancelar
-                        </button>
-                        <button className="bg-blue-500 p-1 rounded text-white font-bold text-sm w-1/3"
-                            type="submit"
-                        >
-                            Actualizar
-                        </button>
-                    </div>
-
-                </form>
+                <PostEdit title={title} image={image} description={description} token={token} _id={_id} editMode={editMode} setReload={setReload} />
             }
         </div>
     )
