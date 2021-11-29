@@ -8,10 +8,8 @@ const PostContainer = ( { filters, reload, setReload, ownerFilter } ) => {
     const { token, user } = useUserContext();
     const [userFavs, setUserFavs] = useState({});
 
-    
-
     useEffect(() => {
-        if(reload){
+        if (reload) {
             const getAll = async () => {
                 if (ownerFilter){
                     const raw = await services.getOwned(token, filters);
@@ -32,7 +30,6 @@ const PostContainer = ( { filters, reload, setReload, ownerFilter } ) => {
         
     }, [filters, reload, ownerFilter]);
 
-
     return (
         <div className="flex flex-col justify-center 
             items-center gap-2 md:gap-4">
@@ -48,6 +45,7 @@ const PostContainer = ( { filters, reload, setReload, ownerFilter } ) => {
                     />
                 )
             }
+            
         </div>
     )
 }

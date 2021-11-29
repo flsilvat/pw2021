@@ -4,27 +4,27 @@ const BASE_URL = "https://posts-pw2021.herokuapp.com/api/v1";
 const services = {};
 
 services.login = async (username, password) => {
-    try {
-        const response = await axios.post(`${BASE_URL}/auth/signin`,
-            {
-                "username": username,
-                "password": password
-            }
-        );
-        return response;
-    } catch (error) {
-        const { response } = error;
-        return response;
-    }
+  try {
+    const response = await axios.post(`${BASE_URL}/auth/signin`,
+      {
+        "username": username,
+        "password": password
+      }
+    );
+    return response;
+  } catch (error) {
+    const { response } = error;
+    return response;
+  }
 }
 
 services.getAll = async (token, filters = {}) => {
-    const { limit, page } = filters;
-    const response = await axios.get(`${BASE_URL}/post/all?limit=${limit}&page=${page}`,{
-        headers: { Authorization: `Bearer ${ token }` }
-    });
-    if (response.status === 200) return response.data;
-    else return {};
+  const { limit, page } = filters;
+  const response = await axios.get(`${BASE_URL}/post/all?limit=${limit}&page=${page}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (response.status === 200) return response.data;
+  else return null;
 }
 
 services.getOwned = async (token, filters = {}) => {
@@ -37,42 +37,84 @@ services.getOwned = async (token, filters = {}) => {
 }
 
 services.getFavs = async (token) => {
-  const response = await axios.get(`${BASE_URL}/post/fav`,{
-    headers: { Authorization: `Bearer ${ token }` }
+  const response = await axios.get(`${BASE_URL}/post/fav`, {
+    headers: { Authorization: `Bearer ${token}` }
   });
   if (response.status === 200) return response.data;
-  else return {};
+  else return null;
 }
 
 services.verifyToken = async (token) => {
-    const response = await axios.get(`${BASE_URL}/auth/whoami`,{
-        headers: { Authorization: `Bearer ${ token }` }
-    });
-    if (response.status === 200) return response.data;
-    else return {};
+  const response = await axios.get(`${BASE_URL}/auth/whoami`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (response.status === 200) return response.data;
+  else return null;
 }
 
 services.create = async (token, data) => {
-  try{
-    const response = await axios.post(`${BASE_URL}/post/create`, 
+  try {
+    const response = await axios.post(`${BASE_URL}/post/create`,
       { ...data, active: data.active = true },
-      { headers: { Authorization: `Bearer ${ token }` } }
+      { headers: { Authorization: `Bearer ${token}` } }
     );
     return response;
   } catch (error) {
-    return {};
+    return null;
   }
 }
 
 services.update = async (token, id, data) => {
-  try{
-    const response = await axios.put(`${BASE_URL}/post/update/${id}`, 
-      { ...data},
-      { headers: { Authorization: `Bearer ${ token }` } }
+  try {
+    const response = await axios.put(`${BASE_URL}/post/update/${id}`,
+      { ...data },
+      { headers: { Authorization: `Bearer ${token}` } }
     );
     return response;
   } catch (error) {
-    return {};
+    return null;
+  }
+}
+
+services.likePost = async (token, id) => {
+  try {
+    const response = await axios.patch(`https://posts-pw2021.herokuapp.com/api/v1/post/like/${id}`, null,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return response;
+  } catch (error) {
+    return null;
+  }
+}
+
+services.favPost = async (token, id) => {
+  try {
+    const response = await axios.patch(`https://posts-pw2021.herokuapp.com/api/v1/post/fav/${id}`, null,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return response;
+  } catch (error) {
+    return null;
+  }
+}
+services.commentPost = async (token, id, data) => {
+  try {
+    const response = await axios.patch(`https://posts-pw2021.herokuapp.com/api/v1/post/comment/${id}`, data,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return response;
+  } catch (error) {
+    return null;
+  }
+}
+services.toggleActive = async (token, id) => {
+  try {
+    const response = await axios.patch(`https://posts-pw2021.herokuapp.com/api/v1/post/toggle/${id}`, null,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return response;
+  } catch (error) {
+    return null;
   }
 }
 
@@ -80,129 +122,129 @@ services.update = async (token, id, data) => {
 // @param - timeStamp - Javascript Date object or date string
 // @usage - timeSince(new Date().setFullYear(2019))
 services.timeSince = (timeStamp) => {
-    if (!(timeStamp instanceof Date)) {
-      timeStamp = new Date(timeStamp);
+  if (!(timeStamp instanceof Date)) {
+    timeStamp = new Date(timeStamp);
+  }
+
+  if (isNaN(timeStamp.getDate())) {
+    return "Invalid date";
+  }
+
+  var now = new Date(),
+    secondsPast = (now.getTime() - timeStamp.getTime()) / 1000;
+
+  var formatDate = function (date, format, utc) {
+    var MMMM = ["\x00", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var MMM = ["\x01", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    var dddd = ["\x02", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    var ddd = ["\x03", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    function ii(i, len) {
+      var s = i + "";
+      len = len || 2;
+      while (s.length < len) s = "0" + s;
+      return s;
     }
 
-    if (isNaN(timeStamp.getDate())) {
-      return "Invalid date";
+    var y = utc ? date.getUTCFullYear() : date.getFullYear();
+    format = format.replace(/(^|[^\\])yyyy+/g, "$1" + y);
+    format = format.replace(/(^|[^\\])yy/g, "$1" + y.toString().substr(2, 2));
+    format = format.replace(/(^|[^\\])y/g, "$1" + y);
+
+    var M = (utc ? date.getUTCMonth() : date.getMonth()) + 1;
+    format = format.replace(/(^|[^\\])MMMM+/g, "$1" + MMMM[0]);
+    format = format.replace(/(^|[^\\])MMM/g, "$1" + MMM[0]);
+    format = format.replace(/(^|[^\\])MM/g, "$1" + ii(M));
+    format = format.replace(/(^|[^\\])M/g, "$1" + M);
+
+    var d = utc ? date.getUTCDate() : date.getDate();
+    format = format.replace(/(^|[^\\])dddd+/g, "$1" + dddd[0]);
+    format = format.replace(/(^|[^\\])ddd/g, "$1" + ddd[0]);
+    format = format.replace(/(^|[^\\])dd/g, "$1" + ii(d));
+    format = format.replace(/(^|[^\\])d/g, "$1" + d);
+
+    var H = utc ? date.getUTCHours() : date.getHours();
+    format = format.replace(/(^|[^\\])HH+/g, "$1" + ii(H));
+    format = format.replace(/(^|[^\\])H/g, "$1" + H);
+
+    var h = H > 12 ? H - 12 : H == 0 ? 12 : H;
+    format = format.replace(/(^|[^\\])hh+/g, "$1" + ii(h));
+    format = format.replace(/(^|[^\\])h/g, "$1" + h);
+
+    var m = utc ? date.getUTCMinutes() : date.getMinutes();
+    format = format.replace(/(^|[^\\])mm+/g, "$1" + ii(m));
+    format = format.replace(/(^|[^\\])m/g, "$1" + m);
+
+    var s = utc ? date.getUTCSeconds() : date.getSeconds();
+    format = format.replace(/(^|[^\\])ss+/g, "$1" + ii(s));
+    format = format.replace(/(^|[^\\])s/g, "$1" + s);
+
+    var f = utc ? date.getUTCMilliseconds() : date.getMilliseconds();
+    format = format.replace(/(^|[^\\])fff+/g, "$1" + ii(f, 3));
+    f = Math.round(f / 10);
+    format = format.replace(/(^|[^\\])ff/g, "$1" + ii(f));
+    f = Math.round(f / 10);
+    format = format.replace(/(^|[^\\])f/g, "$1" + f);
+
+    var T = H < 12 ? "AM" : "PM";
+    format = format.replace(/(^|[^\\])TT+/g, "$1" + T);
+    format = format.replace(/(^|[^\\])T/g, "$1" + T.charAt(0));
+
+    var t = T.toLowerCase();
+    format = format.replace(/(^|[^\\])tt+/g, "$1" + t);
+    format = format.replace(/(^|[^\\])t/g, "$1" + t.charAt(0));
+
+    var tz = -date.getTimezoneOffset();
+    var K = utc || !tz ? "Z" : tz > 0 ? "+" : "-";
+    if (!utc) {
+      tz = Math.abs(tz);
+      var tzHrs = Math.floor(tz / 60);
+      var tzMin = tz % 60;
+      K += ii(tzHrs) + ":" + ii(tzMin);
     }
+    format = format.replace(/(^|[^\\])K/g, "$1" + K);
 
-    var now = new Date(),
-      secondsPast = (now.getTime() - timeStamp.getTime()) / 1000;
+    var day = (utc ? date.getUTCDay() : date.getDay()) + 1;
+    format = format.replace(new RegExp(dddd[0], "g"), dddd[day]);
+    format = format.replace(new RegExp(ddd[0], "g"), ddd[day]);
 
-    var formatDate = function(date, format, utc) {
-      var MMMM = ["\x00", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-      var MMM = ["\x01", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      var dddd = ["\x02", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-      var ddd = ["\x03", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    format = format.replace(new RegExp(MMMM[0], "g"), MMMM[M]);
+    format = format.replace(new RegExp(MMM[0], "g"), MMM[M]);
 
-      function ii(i, len) {
-        var s = i + "";
-        len = len || 2;
-        while (s.length < len) s = "0" + s;
-        return s;
-      }
+    format = format.replace(/\\(.)/g, "$1");
 
-      var y = utc ? date.getUTCFullYear() : date.getFullYear();
-      format = format.replace(/(^|[^\\])yyyy+/g, "$1" + y);
-      format = format.replace(/(^|[^\\])yy/g, "$1" + y.toString().substr(2, 2));
-      format = format.replace(/(^|[^\\])y/g, "$1" + y);
+    return format;
+  };
 
-      var M = (utc ? date.getUTCMonth() : date.getMonth()) + 1;
-      format = format.replace(/(^|[^\\])MMMM+/g, "$1" + MMMM[0]);
-      format = format.replace(/(^|[^\\])MMM/g, "$1" + MMM[0]);
-      format = format.replace(/(^|[^\\])MM/g, "$1" + ii(M));
-      format = format.replace(/(^|[^\\])M/g, "$1" + M);
+  if (secondsPast < 0) { // Future date
+    return timeStamp;
+  }
+  if (secondsPast < 60) { // Less than a minute
+    return parseInt(secondsPast) + 'secs';
+  }
+  if (secondsPast < 3600) { // Less than an hour
+    return parseInt(secondsPast / 60) + 'mins';
+  }
+  if (secondsPast <= 86400) { // Less than a day
+    return parseInt(secondsPast / 3600) + 'hrs';
+  }
+  if (secondsPast <= 172800) { // Less than 2 days
+    return 'Yesderday at ' + formatDate(timeStamp, "h:mmtt");
+  }
+  if (secondsPast > 172800) { // After two days
+    var timeString;
 
-      var d = utc ? date.getUTCDate() : date.getDate();
-      format = format.replace(/(^|[^\\])dddd+/g, "$1" + dddd[0]);
-      format = format.replace(/(^|[^\\])ddd/g, "$1" + ddd[0]);
-      format = format.replace(/(^|[^\\])dd/g, "$1" + ii(d));
-      format = format.replace(/(^|[^\\])d/g, "$1" + d);
+    if (secondsPast <= 604800)
+      timeString = formatDate(timeStamp, "dddd") + " at " + formatDate(timeStamp, "h:mmtt") // with in a week
+    else if (now.getFullYear() > timeStamp.getFullYear())
+      timeString = formatDate(timeStamp, "MMMM d, yyyy") // a year ago
+    else if (now.getMonth() > timeStamp.getMonth())
+      timeString = formatDate(timeStamp, "MMMM d") // months ago
+    else
+      timeString = formatDate(timeStamp, "MMMM d") + " at " + formatDate(timeStamp, "h:mmtt") // with in a month
 
-      var H = utc ? date.getUTCHours() : date.getHours();
-      format = format.replace(/(^|[^\\])HH+/g, "$1" + ii(H));
-      format = format.replace(/(^|[^\\])H/g, "$1" + H);
-
-      var h = H > 12 ? H - 12 : H == 0 ? 12 : H;
-      format = format.replace(/(^|[^\\])hh+/g, "$1" + ii(h));
-      format = format.replace(/(^|[^\\])h/g, "$1" + h);
-
-      var m = utc ? date.getUTCMinutes() : date.getMinutes();
-      format = format.replace(/(^|[^\\])mm+/g, "$1" + ii(m));
-      format = format.replace(/(^|[^\\])m/g, "$1" + m);
-
-      var s = utc ? date.getUTCSeconds() : date.getSeconds();
-      format = format.replace(/(^|[^\\])ss+/g, "$1" + ii(s));
-      format = format.replace(/(^|[^\\])s/g, "$1" + s);
-
-      var f = utc ? date.getUTCMilliseconds() : date.getMilliseconds();
-      format = format.replace(/(^|[^\\])fff+/g, "$1" + ii(f, 3));
-      f = Math.round(f / 10);
-      format = format.replace(/(^|[^\\])ff/g, "$1" + ii(f));
-      f = Math.round(f / 10);
-      format = format.replace(/(^|[^\\])f/g, "$1" + f);
-
-      var T = H < 12 ? "AM" : "PM";
-      format = format.replace(/(^|[^\\])TT+/g, "$1" + T);
-      format = format.replace(/(^|[^\\])T/g, "$1" + T.charAt(0));
-
-      var t = T.toLowerCase();
-      format = format.replace(/(^|[^\\])tt+/g, "$1" + t);
-      format = format.replace(/(^|[^\\])t/g, "$1" + t.charAt(0));
-
-      var tz = -date.getTimezoneOffset();
-      var K = utc || !tz ? "Z" : tz > 0 ? "+" : "-";
-      if (!utc) {
-        tz = Math.abs(tz);
-        var tzHrs = Math.floor(tz / 60);
-        var tzMin = tz % 60;
-        K += ii(tzHrs) + ":" + ii(tzMin);
-      }
-      format = format.replace(/(^|[^\\])K/g, "$1" + K);
-
-      var day = (utc ? date.getUTCDay() : date.getDay()) + 1;
-      format = format.replace(new RegExp(dddd[0], "g"), dddd[day]);
-      format = format.replace(new RegExp(ddd[0], "g"), ddd[day]);
-
-      format = format.replace(new RegExp(MMMM[0], "g"), MMMM[M]);
-      format = format.replace(new RegExp(MMM[0], "g"), MMM[M]);
-
-      format = format.replace(/\\(.)/g, "$1");
-
-      return format;
-    };
-
-    if(secondsPast < 0){ // Future date
-      return timeStamp;
-    }
-    if(secondsPast < 60){ // Less than a minute
-      return parseInt(secondsPast) + 'secs';
-    }
-    if(secondsPast < 3600){ // Less than an hour
-      return parseInt(secondsPast/60) + 'mins';
-    }
-    if(secondsPast <= 86400){ // Less than a day
-      return parseInt(secondsPast/3600) + 'hrs';
-    }
-    if(secondsPast <= 172800){ // Less than 2 days
-      return 'Yesderday at ' + formatDate(timeStamp, "h:mmtt");
-    }
-    if(secondsPast > 172800){ // After two days
-      var timeString;
-
-      if(secondsPast <= 604800)
-        timeString = formatDate(timeStamp, "dddd") + " at " + formatDate(timeStamp, "h:mmtt") // with in a week
-      else if(now.getFullYear() > timeStamp.getFullYear())
-        timeString = formatDate(timeStamp, "MMMM d, yyyy") // a year ago
-      else if(now.getMonth() > timeStamp.getMonth())
-        timeString = formatDate(timeStamp, "MMMM d") // months ago
-      else
-        timeString = formatDate(timeStamp, "MMMM d") + " at " + formatDate(timeStamp, "h:mmtt") // with in a month
-
-      return timeString;
-    }
+    return timeString;
+  }
 }
 
 export default services;

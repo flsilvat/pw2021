@@ -1,14 +1,8 @@
-import axios from 'axios';
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import services from '../services/services';
-import { AiOutlineLike, AiOutlineHeart, AiFillHeart } from 'react-icons/ai';
-import { FaRegCommentAlt } from 'react-icons/fa';
-import { HiOutlineDotsHorizontal } from 'react-icons/hi';
+import { AiOutlineEye, AiOutlineEyeInvisible, AiOutlineEdit, AiOutlineLike, AiFillLike, AiOutlineHeart, AiFillHeart, AiOutlineComment } from 'react-icons/ai';
 import Comment from './Comment';
 import NewComment from './NewComment';
-
-
-
 
 const Post = ({ data, loggedUser, token, userFavs, setReload }) => {
     const { _id, title, description, image, active, user,
@@ -20,74 +14,54 @@ const Post = ({ data, loggedUser, token, userFavs, setReload }) => {
     const [viewComments, setViewComments] = useState(false);
     const [commentTxt, setCommentTxt] = useState("");
     const [editing, setEditing] = useState(false);
-    const [error, setError] = useState(false);
-
-
+    const [confirmActivate, setConfirmActivate] = useState(false);
+    const [error1, setError1] = useState(false);
+    const [error2, setError2] = useState(false);
+    const [error3, setError3] = useState(false);
 
     const onChangeCommentPost = (e) => {
         setCommentTxt(e.target.value);
     }
 
     const commentPost = async (e) => {
-        try {
-            e.preventDefault();
-
-            const body = {
-                description: commentTxt,
-            };
-            await axios.patch(`https://posts-pw2021.herokuapp.com/api/v1/post/comment/${_id}`, body, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            }
-            );
-
-            setCommentTxt("");
-
-            setReload(true);
-
-        }
-        catch (error) {
-            console.log(error)
-        }
+        e.preventDefault();
+        if (!commentTxt) return;
+        const body = {
+            description: commentTxt,
+        };
+        const response = services.commentPost(token, _id, body);
+        setCommentTxt("");
+        if (!response) return;
+        setReload(true);
+        setViewComments(true);
     }
 
     const likePost = async () => {
-        try {
-            const response = await axios.patch(`https://posts-pw2021.herokuapp.com/api/v1/post/like/${_id}`, null,
-                { headers: { Authorization: `Bearer ${token}` } }
-            )
-            if (!like) {
-                setLikesLength(likesLength + 1);
-                setLike(!like);
-            }
-            else {
-                setLikesLength(likesLength - 1);
-                setLike(!like);
-            }
-
-        } catch (error) {
-            console.log(error);
+        const response = services.likePost(token, _id);
+        if (!response) return;
+        if (!like) {
+            setLikesLength(likesLength + 1);
         }
+        else {
+            setLikesLength(likesLength - 1);
+        }
+        setLike(!like);
     }
 
     const favPost = async () => {
-        try {
-            const response = await axios.patch(`https://posts-pw2021.herokuapp.com/api/v1/post/fav/${_id}`, null,
-                { headers: { Authorization: `Bearer ${token}` } }
-            )
-            //console.log(response);
-            if (!fav) setFav(!fav);
-            else setFav(!fav);
-        } catch (error) {
-            console.log(error);
-        }
+        const response = services.favPost(token, _id);
+        if (!response) return;
+        setFav(!fav);
     }
 
     const editMode = () => {
         if (!owner) return;
-        console.log(user);
         setEditing(!editing);
+        if (!editing) {
+            setError1(false);
+            setError2(false);
+            setError3(false);
+        }
     }
 
     const submitEdit = async (e) => {
@@ -96,20 +70,45 @@ const Post = ({ data, loggedUser, token, userFavs, setReload }) => {
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData.entries());
 
+        setError1(false);
+        setError2(false);
+        setError3(false);
+
         if (data.title === '' || data.description === '' || data.image === '') {
-            setError(true);
+            setError1(true);
             return;
         }
-        setError(false);
+        if (data.title.length < 8 || data.title.length > 32) {
+            setError2(true);
+            return;
+        }
+        if (data.description.length < 8) {
+            setError3(true);
+            return;
+        }
         console.log(data);
         const response = await services.update(token, _id, data);
         console.log(response);
-        if (response) {
-            setEditing(!editing);
-            setReload(true);
-        }
+
+        if (!response) return;
+        setEditing(!editing);
+        setReload(true);
     }
 
+    const toggleActive = () => {
+        if (!confirmActivate) {
+            setConfirmActivate(true);
+            return;
+        }
+        setConfirmActivate(false);
+        const response = services.toggleActive(token, _id);
+        if (!response) return;
+        setReload(true);
+    }
+
+    const showComments = () => {
+        setViewComments(!viewComments);
+    }
 
     return (
         <div className="bg-white flex flex-col w-full md:rounded-lg md:shadow">
@@ -120,21 +119,28 @@ const Post = ({ data, loggedUser, token, userFavs, setReload }) => {
                         {services.timeSince(createdAt)}
                     </p>
                 </div>
-                {owner &&
-                    <button
-                        className="hover:text-red-500 font-bold"
-                        onClick={editMode} type="button"
-                    >
-                        <HiOutlineDotsHorizontal size={22} color='#566573' />
-                    </button>
+                {owner && !editing &&
+                    <div className="flex row gap-3 items-center">
+                        {confirmActivate ? <p className="text-red-600 ">¿Esta seguro?</p> : ''}
+                        <button
+                            className={`${confirmActivate ? "text-white bg-red-600" : "text-gray-600 bg-gray-200"} p-2 rounded-full flex justify-center gap-1 items-center`}
+                            onClick={toggleActive} type="button"
+                        >
+                            {active ? <AiOutlineEyeInvisible size={24} /> : <AiOutlineEye size={24} />}
+                        </button>
+                        <button
+                            className="text-gray-600 bg-gray-200 p-2 rounded-full flex justify-center gap-1 items-center"
+                            onClick={editMode} type="button"
+                        >
+                            <AiOutlineEdit size={24} color='#566573' />
+                        </button>
+                    </div>
                 }
 
             </div>
             {!editing &&
-                <p className="px-2 md:px-3 md:pb-3 text-sm font-bold">{title}</p>
+                <p className="px-2 md:px-3 md:pb-3 text-sm font-bold">{title} {active ? '' : <span className="text-red-600">(Desactivada)</span>}</p>
             }
-
-
 
             {!editing &&
                 <p className="px-2 pb-2 md:px-3 md:pb-3 text-sm">{description}</p>
@@ -154,7 +160,7 @@ const Post = ({ data, loggedUser, token, userFavs, setReload }) => {
                             justify-center gap-1 items-center ${like && 'text-blue-500 font-bold'}`}
                         onClick={likePost} type="button"
                     >
-                        <AiOutlineLike size={22} />
+                        {like ? <AiFillLike size={24} /> : <AiOutlineLike size={24} />}
                         {likesLength != 0 ? likesLength : ''}
                     </button>
                     <button
@@ -165,19 +171,22 @@ const Post = ({ data, loggedUser, token, userFavs, setReload }) => {
                         {fav ? <AiFillHeart size={24} /> : <AiOutlineHeart size={24} />}
 
                     </button>
-                    <div className="text-gray-600 bg-gray-200 w-1/5 p-2 rounded-full flex justify-center gap-1 items-center">
-                        <FaRegCommentAlt size={19} />
+                    <button
+                        className={`text-gray-600 bg-gray-200 w-1/5 p-2 rounded-full flex 
+                        justify-center gap-1 items-center ${viewComments && 'text-green-500 font-bold'}`}
+                        onClick={showComments} type="button"
+                    >
+                        <AiOutlineComment size={24} />
                         {comments.length != 0 ? comments.length : ''}
-                    </div>
+                    </button>
                 </div>
-
             }
             {!editing &&
                 <div>
                     <NewComment onClick={commentPost} onChange={onChangeCommentPost} value={commentTxt} />
                 </div>
             }
-            {!editing &&
+            {!editing && viewComments &&
                 <div className="w-full">
                     {comments && comments.map((comment) => (
                         <Comment key={comment._id} comment={comment} />
@@ -189,7 +198,11 @@ const Post = ({ data, loggedUser, token, userFavs, setReload }) => {
                 <form className="bg-white flex flex-col p-2 mb-2 items-center"
                     onSubmit={submitEdit}
                 >
-                    {error && <p>Todos los campos son requeridos!</p>}
+                    <div className="text-red-600">
+                        {error1 && <p>Todos los campos son requeridos!</p>}
+                        {error2 && <p>Titulo debe ser entre 8 y 32 caracteres de largo.</p>}
+                        {error3 && <p>Descripcion debe ser minimo 8 caracteres de largo.</p>}
+                    </div>
                     <input className="bg-gray-100 px-3 py-1 mb-2 w-4/5 text-sm rounded-full placeholder-gray-800"
                         type="text"
                         name="title"
@@ -211,11 +224,19 @@ const Post = ({ data, loggedUser, token, userFavs, setReload }) => {
                         placeholder="Descripcion del Post"
                         defaultValue={description}
                     />
-                    <button className="bg-blue-500 p-1 rounded text-white font-bold text-sm w-1/3"
-                        type="submit"
-                    >
-                        Actualizar
-                    </button>
+                    <div className="flex row w-full justify-center g-3">
+                        <button className="bg-gray-200 p-1 rounded text-gray-600 font-bold text-sm w-1/3"
+                            onClick={editMode}
+                        >
+                            Cancelar
+                        </button>
+                        <button className="bg-blue-500 p-1 rounded text-white font-bold text-sm w-1/3"
+                            type="submit"
+                        >
+                            Actualizar
+                        </button>
+                    </div>
+
                 </form>
             }
         </div>
