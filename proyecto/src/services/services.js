@@ -27,6 +27,15 @@ services.getAll = async (token, filters = {}) => {
     else return {};
 }
 
+services.getOwned = async (token, filters = {}) => {
+  const { limit, page } = filters;
+  const response = await axios.get(`${BASE_URL}/post/owned?limit=${limit}&page=${page}`,{
+      headers: { Authorization: `Bearer ${ token }` }
+  });
+  if (response.status === 200) return response.data;
+  else return {};
+}
+
 services.getFavs = async (token) => {
   const response = await axios.get(`${BASE_URL}/post/fav`,{
     headers: { Authorization: `Bearer ${ token }` }

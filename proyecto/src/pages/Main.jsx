@@ -12,6 +12,7 @@ const Main = () => {
     const nav = useNavigate();
     const [filters, setFilters] = useState({ limit: 15, page: 0 });
     const [reload,setReload] = useState(true);
+    const [ownerFilter, setOwnerFilter] = useState(false);
 
     const logoutHandler = () => {
         logout();
@@ -37,6 +38,10 @@ const Main = () => {
         setReload(true);
         setFilters({ limit: 15, page: page + 1 });
     }
+    const setOwnerHandler = () => {
+        setOwnerFilter(!ownerFilter);
+        setReload(true);
+    }
 
     return (
         <div className="bg-gray-400 md:bg-gray-200">
@@ -45,19 +50,35 @@ const Main = () => {
                     <h2 className="mt-2 ml-2">
                         Bienvenido <span className="text-blue-500 font-bold">{ user?.username }</span>
                     </h2>
-                    <button
-                        onClick={logoutHandler}
-                        type="button"
-                        className="bg-gray-200 rounded-full p-1 m-1 mr-2"
+                    <div className="flex items-center">
+                    {user?.role === 'admin' && (
+                        <button 
+                            className={`text-xs font-bold bg-gray-200 rounded-full mr-1 px-2 
+                            h-8 ${ownerFilter && 'font-bold bg-blue-500'}`}
+                            onClick={setOwnerHandler}
                         >
-                        <BiLogOutCircle size={28} />
-                    </button>
+                            My Posts
+                        </button>
+                    )}
+                        <button
+                            onClick={logoutHandler}
+                            type="button"
+                            className="bg-gray-200 rounded-full p-1 m-1 mr-2"
+                            >
+                            <BiLogOutCircle size={28} />
+                        </button>
+                    </div>
                 </div>
                 {user?.role === 'admin' && (
                     <NewPostForm setReload={setReload}/>
                 )}
 
-                <PostContainer filters={filters} reload={reload} setReload={setReload} />
+                <PostContainer 
+                    filters={filters} 
+                    reload={reload} 
+                    setReload={setReload} 
+                    ownerFilter={ownerFilter}
+                />
 
                 <div className="flex justify-center py-3 gap-10">
                     {filters.page!==0 &&
