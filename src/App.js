@@ -4,7 +4,7 @@ import Login from './pages/Login';
 import Main from './pages/Main';
 
 const App = () => (
-  <BrowserRouter>
+  <BrowserRouter basename={process.env.PUBLIC_URL}>
     <Routes>
       <Route exact path="/" element={<Main />} />
       <Route exact path="/login" element={<Login />} />
