@@ -45,8 +45,8 @@ const Main = () => {
 
     return (
         <div className="bg-gray-400 md:bg-gray-200">
-            <div className="w-full md:w-3/4 flex flex-col m-auto">
-                <div className="bg-white flex justify-between mb-2 md:mb-4">
+            <div className="w-full md:w-3/4 lg:max-w-3xl flex flex-col m-auto">
+                <div className="bg-white flex justify-between mb-2 md:my-3 md:rounded-lg md:shadow">
                     <h2 className="mt-2 ml-2">
                         Bienvenido <span className="text-blue-500 font-bold">{ user?.username }</span>
                     </h2>
