@@ -40,7 +40,9 @@ const NewPostForm = ({ setReload }) => {
     }
 
     return (
-        <form name="new-post" id="new-post" className="bg-white flex flex-col p-2 mb-2 items-center"
+        <form name="new-post" id="new-post" 
+            className="bg-white flex flex-col p-2 mb-2 items-center 
+            md:mb-4 md:rounded-lg md:shadow md:py-3 md:px-4"
             onSubmit={onSubmit}
         >
             <div className="text-red-600">
